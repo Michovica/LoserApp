@@ -1,0 +1,72 @@
+<h1>Add tasks</h1>
+<a href="{% url 'fillResults' %}">Fill Results</a>
+</br></br>
+<button onclick="addNames()">Add +</button>
+
+<form id="names" method="POST">
+{% csrf_token %}
+
+
+<input type="submit">
+</form>
+
+</br></br>
+<button onclick="Submit()">Submit1</button>
+
+
+
+
+<script>
+
+    var tasksCount = 0
+    function addNames()
+    {
+		console.log('tady')
+        document.getElementById("names").innerHTML  = '<input id="' + tasksCount + '" name="' + tasksCount + '">' + '</br>' + document.getElementById('names').innerHTML
+        tasksCount++
+    }
+
+    function Submit()
+    {   
+        let data = {}
+        for(let i = 0; i < tasksCount; i++)
+        {
+            data[i] = document.getElementById(i).value 
+        }
+        
+        sendRequest(window.location.href, data)
+    }
+
+    function sendRequest(url, data)
+    {
+
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+
+            url: url,
+            error: function (xhr, status, error) {
+
+                var err_msg = ''
+                for (var prop in xhr.responseJSON) {
+                    err_msg += prop + ': ' + xhr.responseJSON[prop] + '\n';
+                }
+
+                alert(status);
+            },
+            success: function (result) 
+            {
+                document.getElementById("messageDiv").innerHTML = ""
+
+                for(let i = result.length - 1; i >= 0; i--)	
+                {
+                    document.getElementById("messageDiv").innerHTML = document.getElementById("messageDiv").innerHTML  + result[i].value + "</br>" + result[i].sender + "</br></br></br></br>"
+
+                }			
+            }
+        });
+    }
+
+
+</script>
