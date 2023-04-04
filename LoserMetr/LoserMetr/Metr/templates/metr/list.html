@@ -1,2 +1,78 @@
 <h1>Michal Svoboda is loser by: {{totalLoser}} %</h1>
 
+{% if user.is_authenticated %}
+
+<button onclick='location.href=location.href + "logout";'>Logout</button>
+
+{% else %}
+  
+<button onclick='location.href=location.href + "register"'>Register</button>
+
+
+{%endif%}
+
+</br></br></br>
+<p id="warning"></p>
+<button id="addTaskBut" onclick="Redirect({% url 'addTasks' %})">AddTasks</button>
+</br></br>
+
+<button id="fillResultsBut" onclick="Redirect({% url 'fillResults' %})">fillResults</button>
+</br></br>
+
+<script>
+
+	if("{{lastUpdated}}" == "None" || Math.abs(parseInt("{{lastUpdated}}") - (new Date().getTime() / 1000)) > 601200)
+	{//you can fill results
+		
+		document.querySelector('#addTaskBut').disabled = false;
+		document.querySelector('#fillResultsBut').disabled = false;
+		document.getElementById("warning").innerHTML = ""
+	}else
+	{//its not the time
+
+		document.querySelector('#addTaskBut').disabled = true;
+		document.querySelector('#fillResultsBut').disabled = true;
+		document.getElementById("warning").innerHTML  = 'You can add tasks or fill results once a week'
+	}
+
+
+</script>
+
+
+</br>
+{% for task in tasks %}
+
+	<p>{{task.name}}</p>
+
+{% endfor %}
+
+
+
+<script>
+
+	function Redirect(url)
+	{
+		location.href = url
+	}
+
+</script>
+
+</br>
+</br>
+</br>
+
+<h2>Users:</h2>
+<div style="border:1px solid black;">
+</br>
+
+
+	{% for user in users %}
+	
+		<a href="{% url 'User' username=user%}">{{user}}</a>
+		</br></br>
+
+
+	{% endfor %}
+	
+</br>
+</div>

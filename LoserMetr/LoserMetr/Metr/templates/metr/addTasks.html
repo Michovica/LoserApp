@@ -1,29 +1,80 @@
 <h1>Add tasks</h1>
-<a href="{% url 'fillResults' %}">Fill Results</a>
+
+<div>
+	{% if messages %}
+		{% for message in messages %}
+
+			{{message}}
+
+		{% endfor %}
+	{% endif %}
+</div>
+
+
+<a href="{% url 'index' %}">Back</a>
 </br></br>
 <button onclick="addNames()">Add +</button>
+<button onclick="removeLastChild()">Remove Last</button>
+</br></br>
 
-<form id="names" method="POST">
+<form  method="POST">
 {% csrf_token %}
 
-
+<div id="names"></div>
+</br></br>
 <input type="submit">
 </form>
-
-</br></br>
-<button onclick="Submit()">Submit1</button>
-
-
 
 
 <script>
 
     var tasksCount = 0
-    function addNames()
+    function addNames(value = "", checked = "True")
     {
-		console.log('tady')
-        document.getElementById("names").innerHTML  = '<input id="' + tasksCount + '" name="' + tasksCount + '">' + '</br>' + document.getElementById('names').innerHTML
+            
+        let label = document.createElement("INPUT");
+        label.setAttribute("type", "text");
+        label.setAttribute("value", value);
+        label.setAttribute("id", tasksCount)
+        label.setAttribute("name", tasksCount)
+
+        let checkbox = document.createElement("INPUT")
+        checkbox.setAttribute("type", "checkbox")
+        checkbox.setAttribute("id", "check" + tasksCount)
+        checkbox.setAttribute("name", "check" + tasksCount)
+        if(checked == "True")
+        {
+            checkbox.setAttribute("checked", "")
+        }
+
+        let text = document.createElement("LABEL")
+        text.setAttribute("id", "text" + tasksCount)
+        text.innerHTML = "Public";
+
+        let br = document.createElement('br');
+        br.setAttribute("id", "br" + tasksCount)
+
+        document.getElementById("names").appendChild(label)
+        document.getElementById("names").appendChild(checkbox)
+        document.getElementById("names").appendChild(text)
+        document.getElementById("names").appendChild(br)
+
+
         tasksCount++
+    }
+
+    function removeLastChild()
+    {
+        if(document.getElementById((tasksCount - 1).toString()) != null)
+        {            
+            document.getElementById((tasksCount - 1).toString()).remove();
+            document.getElementById("check" + (tasksCount - 1).toString()).remove();
+            document.getElementById("text" + (tasksCount - 1).toString()).remove();
+            document.getElementById("br" + (tasksCount - 1).toString()).remove();
+
+            tasksCount--            
+        }
+        
     }
 
     function Submit()
@@ -68,5 +119,13 @@
         });
     }
 
+    console.log("{{tasks}}")
+    {% for task in tasks  %}
+    
+        addNames("{{task.name}}", "{{task.public}}")
+
+    {% endfor %}
+
 
 </script>
+

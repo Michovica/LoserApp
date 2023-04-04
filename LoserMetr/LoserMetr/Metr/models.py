@@ -1,30 +1,22 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from datetime import datetime    
+
 
 # Create your models here.
 class Task(models.Model):
-    name = models.CharField(max_length=30)
+    
+    owner = models.CharField(max_length=50, null=True)
+    name = models.CharField(max_length=250)
     compleated = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    public = models.BooleanField(default=True)
 
 
 class LoserValue(models.Model):
     
-    
+    owner = models.CharField(max_length=50, null=True)
     value = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     updatesCount = models.IntegerField(default=0)
+    lastUpdated = models.DateTimeField(default=datetime.now, blank=True)
 
-    def save(self):
-        # count will have all of the objects from the Aboutus model
-        count = LoserValue.objects.all().count()
-        # this will check if the variable exist so we can update the existing ones
-        save_permission = LoserValue.has_add_permission(self)
-
-        # if there's more than two objects it will not save them in the database
-        if count < 2:
-            super(LoserValue, self).save()
-        elif save_permission:
-            super(LoserValue, self).save()
-            
-
-    def has_add_permission(self):
-        return LoserValue.objects.filter(id=self.id).exists()
+    
