@@ -1,0 +1,131 @@
+<h1>Add tasks</h1>
+
+<div>
+	{% if messages %}
+		{% for message in messages %}
+
+			{{message}}
+
+		{% endfor %}
+	{% endif %}
+</div>
+
+
+<a href="{% url 'index' %}">Back</a>
+</br></br>
+<button onclick="addNames()">Add +</button>
+<button onclick="removeLastChild()">Remove Last</button>
+</br></br>
+
+<form  method="POST">
+{% csrf_token %}
+
+<div id="names"></div>
+</br></br>
+<input type="submit">
+</form>
+
+
+<script>
+
+    var tasksCount = 0
+    function addNames(value = "", checked = "True")
+    {
+            
+        let label = document.createElement("INPUT");
+        label.setAttribute("type", "text");
+        label.setAttribute("value", value);
+        label.setAttribute("id", tasksCount)
+        label.setAttribute("name", tasksCount)
+
+        let checkbox = document.createElement("INPUT")
+        checkbox.setAttribute("type", "checkbox")
+        checkbox.setAttribute("id", "check" + tasksCount)
+        checkbox.setAttribute("name", "check" + tasksCount)
+        if(checked == "True")
+        {
+            checkbox.setAttribute("checked", "")
+        }
+
+        let text = document.createElement("LABEL")
+        text.setAttribute("id", "text" + tasksCount)
+        text.innerHTML = "Public";
+
+        let br = document.createElement('br');
+        br.setAttribute("id", "br" + tasksCount)
+
+        document.getElementById("names").appendChild(label)
+        document.getElementById("names").appendChild(checkbox)
+        document.getElementById("names").appendChild(text)
+        document.getElementById("names").appendChild(br)
+
+
+        tasksCount++
+    }
+
+    function removeLastChild()
+    {
+        if(document.getElementById((tasksCount - 1).toString()) != null)
+        {            
+            document.getElementById((tasksCount - 1).toString()).remove();
+            document.getElementById("check" + (tasksCount - 1).toString()).remove();
+            document.getElementById("text" + (tasksCount - 1).toString()).remove();
+            document.getElementById("br" + (tasksCount - 1).toString()).remove();
+
+            tasksCount--            
+        }
+        
+    }
+
+    function Submit()
+    {   
+        let data = {}
+        for(let i = 0; i < tasksCount; i++)
+        {
+            data[i] = document.getElementById(i).value 
+        }
+        
+        sendRequest(window.location.href, data)
+    }
+
+    function sendRequest(url, data)
+    {
+
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+
+            url: url,
+            error: function (xhr, status, error) {
+
+                var err_msg = ''
+                for (var prop in xhr.responseJSON) {
+                    err_msg += prop + ': ' + xhr.responseJSON[prop] + '\n';
+                }
+
+                alert(status);
+            },
+            success: function (result) 
+            {
+                document.getElementById("messageDiv").innerHTML = ""
+
+                for(let i = result.length - 1; i >= 0; i--)	
+                {
+                    document.getElementById("messageDiv").innerHTML = document.getElementById("messageDiv").innerHTML  + result[i].value + "</br>" + result[i].sender + "</br></br></br></br>"
+
+                }			
+            }
+        });
+    }
+
+    console.log("{{tasks}}")
+    {% for task in tasks  %}
+    
+        addNames("{{task.name}}", "{{task.public}}")
+
+    {% endfor %}
+
+
+</script>
+

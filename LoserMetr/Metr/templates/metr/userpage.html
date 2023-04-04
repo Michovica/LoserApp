@@ -1,0 +1,24 @@
+<h1>{{username}} - {{loserValue}} % loser</h1>
+
+<a href="{% url 'index' %}">Back</a>
+
+</br></br></br>
+{% for task in tasks %}
+
+	<p>{{task.name}}</p>
+
+{% endfor %}
+
+
+
+<div id="priveteTasks">
+</div>
+
+<script>
+
+	for(let i = 0; i < parseInt({{tasksLen}}); i++)
+	{
+		document.getElementById("priveteTasks").innerHTML = document.getElementById("priveteTasks").innerHTML + '<p>"Private task"</p>'
+	}
+
+</script>

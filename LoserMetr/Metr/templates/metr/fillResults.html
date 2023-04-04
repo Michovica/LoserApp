@@ -1,0 +1,30 @@
+<h1>Fill results</h1>
+<a href="{% url 'index' %}">Back</a>
+</br></br>
+
+<div>
+	{% if messages %}
+		{% for message in messages %}
+
+			{{message}}
+
+		{% endfor %}
+	{% endif %}
+</div>
+
+
+<form method="POST">
+	{% csrf_token %}
+	{% for task in tasks %}
+
+		<p> {{task.name}} </p> 
+		<input type="text" id="{{task.name}}" name="{{task.name}}">
+		<p> % </p> 
+
+		<br></br>
+
+	{% endfor %}
+
+ 	</br></br>
+	<input type="submit">
+</form>
