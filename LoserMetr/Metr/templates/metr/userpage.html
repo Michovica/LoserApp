@@ -16,7 +16,7 @@
 
 <script>
 
-	for(let i = 0; i < parseInt({{tasksLen}}); i++)
+	for(let i = 0; i < (parseInt({{tasksLen}}) - {{tasks|length}}); i++)
 	{
 		document.getElementById("priveteTasks").innerHTML = document.getElementById("priveteTasks").innerHTML + '<p>"Private task"</p>'
 	}

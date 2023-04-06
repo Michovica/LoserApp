@@ -20,12 +20,11 @@ def index(request):
     loserData = LoserValue.objects.filter(owner=request.user)   
     users = User.objects.all()
     if len(loserData) == 0:        
-        return render(request, "metr/list.html", {"totalLoser": 100, "lastUpdated": None, "users": users, "tasks": tasks})
+        return render(request, "metr/list.html", {"totalLoser": 100, "showAddTask": canI(request.user, False), "showFillResults": canI(request.user, True), "users": users, "tasks": tasks})
         
     
     totalLoser = loserData[0].value
-    lastUpdated = getLastTime(request.user)    
-    return render(request, "metr/list.html", {"totalLoser": totalLoser, "lastUpdated": lastUpdated, "users": users, "tasks": tasks})
+    return render(request, "metr/list.html", {"totalLoser": totalLoser, "showAddTask": canI(request.user, False), "showFillResults": canI(request.user, True), "users": users, "tasks": tasks})
 
 
 
@@ -94,10 +93,7 @@ def AddTasks(request):
     
     
     #check if is right time
-    lastTime = getLastTime(request.user)
-    if lastTime == None or abs(lastTime - datetime.now().timestamp()) > 601200:
-        pass
-    else:
+    if canI(request.user, False) == False:
         return redirect("index")        
 
     
@@ -106,7 +102,10 @@ def AddTasks(request):
     if request.method != 'POST':        
         return render(request, 'metr/addTasks.html', {"tasks": tasks})
     
-    else:    
+    else:        
+        
+        setLastFill(request.user, False)
+        
         Task.objects.filter(owner=request.user).delete()    
         i = 0
         
@@ -122,7 +121,7 @@ def AddTasks(request):
             task.save()         
             i += 1
             
-        return render(request, 'metr/addTasks.html', {"tasks": tasks})
+        return redirect('addTasks')
 
 
 def FillResults(request):
@@ -132,11 +131,8 @@ def FillResults(request):
         return redirect("Login")
     
     #check if is right time
-    lastTime = getLastTime(request.user)
-    if lastTime == None or abs(lastTime - datetime.now().timestamp()) > 601200:
-        pass
-    else:
-        return redirect("index")      
+    if canI(request.user, True) == False:
+        return redirect("index")       
     
     
     
@@ -145,6 +141,9 @@ def FillResults(request):
         return render(request, 'metr/fillResults.html', {'tasks': tasks})
     
     else:
+        
+        setLastFill(request.user, True)
+        
         tasks = Task.objects.filter(owner=request.user)
         
         for task in tasks:
@@ -168,10 +167,9 @@ def FillResults(request):
             neco.save()
         else:
             loserRow = LoserValue.objects.filter(owner=str(request.user))[0]
-            loserRow.value = calculateOverallLoser(curetLoserValue)
+            loserRow.value = calculateOverallLoser(curetLoserValue, request.user)
             loserRow.owner = str(request.user)
             loserRow.updatesCount = loserRow.updatesCount + 1
-            loserRow.lastUpdated = datetime.now()
             loserRow.save()
 
         
@@ -189,14 +187,6 @@ def DisplayUser(request, username):
             
             
 #region SecondaryMethods
-
-def getLastTime(user):
-    loserData = LoserValue.objects.filter(owner=user)
-    
-    if len(loserData) == 0:   
-        return None
-    
-    return loserData[0].lastUpdated.timestamp()
 
 
 def try_parse_int(text):
@@ -226,5 +216,35 @@ def calculateOverallLoser(curretLoserValue, name):
     
     return ((overall * updated) + curretLoserValue) / (updated + 1)
     
+def canI(name, fill: bool):
+    loserList = LoserValue.objects.filter(owner=name)
     
+    if len(loserList) == 0:
+        if fill == False:
+            return True
+        else: 
+            return False
+    else:
+        value = loserList[0].lastFill
+        if fill == True:
+            return not value
+        else:
+            return value
+             
+            
+def setLastFill(name, lastFill: bool):
+    valueList = LoserValue.objects.filter(owner=name)
+    
+    if(len(valueList) == 0):
+        newVal = LoserValue()
+        newVal.owner = name
+        newVal.lastFill = lastFill
+        newVal.value = 100
+        newVal.save()
+        return 
+    
+    valueList[0].lastFill = lastFill
+    valueList[0].save()    
+    
+
 #endregion 

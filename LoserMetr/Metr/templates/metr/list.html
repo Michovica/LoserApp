@@ -12,16 +12,18 @@
 {%endif%}
 
 </br></br></br>
-<p id="warning"></p>
+<p>Add tasks that you want to complete this week and at the end of the week rate yourself on how many percent did you complete them.</p>
+
 <button id="addTaskBut" onclick="Redirect({% url 'addTasks' %})">AddTasks</button>
 </br></br>
 
 <button id="fillResultsBut" onclick="Redirect({% url 'fillResults' %})">fillResults</button>
 </br></br>
 
+
 <script>
 
-	if("{{lastUpdated}}" == "None" || Math.abs(parseInt("{{lastUpdated}}") - (new Date().getTime() / 1000)) > 601200)
+	{% comment %} if("{{lastUpdated}}" == "None" || Math.abs(parseInt("{{lastUpdated}}") - (new Date().getTime() / 1000)) > 601200)
 	{//you can fill results
 		
 		document.querySelector('#addTaskBut').disabled = false;
@@ -33,8 +35,24 @@
 		document.querySelector('#addTaskBut').disabled = true;
 		document.querySelector('#fillResultsBut').disabled = true;
 		document.getElementById("warning").innerHTML  = 'You can add tasks or fill results once a week'
+	} {% endcomment %}
+
+
+	if("{{showAddTask}}" == "True")
+	{
+		document.querySelector('#addTaskBut').disabled = false;
+	}else
+	{
+		document.querySelector('#addTaskBut').disabled = true;
 	}
 
+	if("{{showFillResults}}" == "True")
+	{
+		document.querySelector('#fillResultsBut').disabled = false;
+	}else
+	{
+		document.querySelector('#fillResultsBut').disabled = true;
+	}
 
 </script>
 

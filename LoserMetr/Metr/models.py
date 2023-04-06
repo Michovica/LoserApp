@@ -17,6 +17,5 @@ class LoserValue(models.Model):
     owner = models.CharField(max_length=50, null=True)
     value = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     updatesCount = models.IntegerField(default=0)
-    lastUpdated = models.DateTimeField(default=datetime.now, blank=True)
-
+    lastFill = models.BooleanField(default=True)
     
